@@ -1,0 +1,336 @@
+// 컬렉션 중심 프로그래밍의 4가지 유형과 함수
+
+// 1. 수집하기 - map, values, pluck 등
+// 2. 거르기 - filter, reject, compact, without 등
+// 3. 찾아내기 - find, some, every 등
+// 4. 접기 - reduce, min, max, group_by, count_by
+
+컬렉션 중심 프로그래밍은 함수형 프로그래밍에서 더욱 빛을 발하는 부분임!
+
+var users = [
+  { id: 10, name: 'ID', age: 36 },
+  { id: 20, name: 'BJ', age: 32 },
+  { id: 30, name: 'JM', age: 32 },
+  { id: 40, name: 'PJ', age: 27 },
+  { id: 50, name: 'HA', age: 25 },
+  { id: 60, name: 'JE', age: 26 },
+  { id: 70, name: 'JI', age: 31 },
+  { id: 80, name: 'MP', age: 23 },
+  { id: 90, name: 'FP', age: 13 }
+];
+
+// 컬렉션 중심 프로그래밍의 유형별 함수 만들기
+
+// <1> 수집하기 - map
+console.log(
+  _map(users, function(user){
+    return user.name;
+  })
+)
+
+//   1. values
+key-value쌍으로 되어있는 경우 유용하게 사용
+
+function _values(data){
+  return _map(data, function(val){
+    return val;
+  })
+}
+console.log(_values(users[0]));
+
+function _identity(val){
+  return val;
+}   //identity가 필요한 이유 : mapper(위의 경우 function(val))와 유사하게 동작
+
+//   2. pluck -> 간결한 표현으로 원하는 값 추출 가능, 편리함
+
+function _pluck(data, key){
+  return _map(data, function(obj){
+    return obj[key];
+  });
+}
+_pluck(users, 'age'); => //[33,22,11,...]
+
+console.log( _pluck(users, 'age') );
+console.log( _pluck(users, 'name') );
+console.log( _pluck(users, 'id') );
+// [33, 22, 11, ...]
+
+// <2> 거르기 - filter
+console.log(
+  _filter(users, function(user) {
+    return user.age > 30;
+  })
+);
+
+console.log(
+  _reject(users, function(user) {
+    return user.age > 30;
+  })
+);
+
+//   1. reject(<->filter)
+function _reject(data, predi){
+  return _filter(data, function(val){
+    return !predi(val);
+  })
+}
+
+function _negate(func){
+  return function(val){
+    return !func(val);
+  }
+}
+
+다음과 같이 변경 가능 =>
+function _reject(data, predi){
+  return filter(data, _negate(predi));
+}
+
+//   2. compact -> 간단하게 
+function _compact = _filter(_identity);
+
+console.log(
+  _compact([1, 2, 0, false, null, {}]));
+
+// <3> 찾아내기 - find -> 배열 안 값들을 돌며 첫 true 값 하나만을 꺼냄
+//   1. find 만들기
+function _find(list, predi){
+  var keys = _keyw(list);
+  for(var i=0; len = keys.length; i<len; i++){
+    val val = list[keys[i]];
+    if(predi(val))
+      return val;
+  }
+}
+
+_find(users, function(user){
+  return user.id == 20;
+});
+
+console.log(
+  _get(_find(users, function(user) {
+    return user.id == 50;
+  }), 'name')
+);
+
+//   2. find_index
+function _find_index(list, predi){
+  var keys = _keyw(list);
+  for(var i=0; len = keys.length; i<len; i++){
+    if(predi(list[keys[i]]))
+      return i;
+  }
+  return -1;
+}
+
+_go(users,
+  _find_index(function(user) { return user.id == 50; }),
+  console.log);
+
+console.log(
+  _find_index(users, function(user) {
+    return user.id == 50;
+  })
+);
+
+//   3. some
+_some([1,2,5,10,20], function(val){
+  return val>10;
+})    -> true / false가 return으로 나옴
+
+console.log(_some([1, 2, 5, 10, 20], function(val) {
+  return val > 20;
+}));
+
+console.log(_some([1, 2, 5, 10, 20], function(val) {
+  return val > 10;
+}));
+
+//   4. every -> 모든 값이 조건에 만족해야 true가 나옴
+function _every(data, predi){
+  return _find_index(data, _negate(predi));
+}
+
+console.log(_every([1, 2, 5, 10, 20], function(val) {
+  return val > 10;
+}));
+// false
+console.log(_every([12, 24, 5, 10, 20], function(val) {
+  return val > 3;
+}));
+// true
+
+console.log(
+  _some([1, 2, 0, 10])
+)
+// true
+
+console.log(
+  _some([null, false, 0])
+)
+// false
+
+console.log(
+  _some([null, false, 1])
+)
+// true
+
+console.log(
+  _every([1, 2, 0, 10])
+)
+// false
+
+console.log(
+  _every([null, false, 0])
+)
+// false
+
+console.log(
+  _every([null, false, 1])
+)
+// false
+
+console.log(
+  _every([1, 2, 10])
+)
+// true
+
+console.log(
+  _some(users, function(user) {
+    return user.age < 20;
+  })
+);
+
+
+// <4> 접기 - reduce
+
+function _min(data) {
+  return _reduce(data, function(a, b) {
+    return a < b ? a : b;
+  });
+}
+
+function _max(data) {
+  return _reduce(data, function(a, b) {
+    return a > b ? a : b;
+  });
+}
+
+console.log(
+  _min([1, 2, 4, 10, 5, -4])
+);
+console.log(
+  _max([1, 2, 4, 10, 5, -4])
+);
+
+function _min_by(data, iter) {
+  return _reduce(data, function(a, b) {
+    return iter(a) < iter(b) ? a : b;
+  });
+}
+function _max_by(data, iter) {
+  return _reduce(data, function(a, b) {
+    return iter(a) > iter(b) ? a : b;
+  });
+}
+var _min_by = _curryr(_min_by),
+  _max_by = _curryr(_max_by);
+
+console.log(
+  _min_by([1, 2, 4, 10, 5, -4], Math.abs)
+);
+
+console.log(
+  _max_by([1, 2, 4, 10, 5, -4, -11], Math.abs)
+);
+
+console.log(
+  _min_by(users, function(user) {
+    return user.age;
+  })
+);
+
+_go(users,
+  _filter(user => user.age >= 30),
+  _map(_get('age')),
+  _min,
+  console.log);
+
+_go(users,
+  _reject(user => user.age >= 30),
+  _max_by(_get('age')),
+  _get('name'),
+  console.log);
+
+console.clear();
+
+//   1. min, max, min_by, max_by
+
+//   2. group_by, push
+var users = [
+  { id: 10, name: 'ID', age: 36 },
+  { id: 20, name: 'BJ', age: 32 },
+  { id: 30, name: 'JM', age: 32 },
+  { id: 40, name: 'PJ', age: 27 },
+  { id: 50, name: 'HA', age: 25 },
+  { id: 60, name: 'JE', age: 26 },
+  { id: 70, name: 'JI', age: 31 },
+  { id: 80, name: 'MP', age: 23 },
+  { id: 90, name: 'FP', age: 13 }
+];
+
+//var users2 = {
+//  36: [{ id: 10, name: 'ID', age: 36 }],
+//  32: [{ id: 20, name: 'BJ', age: 32 }, { id: 30, name: 'JM', age: 32 }],
+//  27: [],
+//  ...
+//}
+
+_go(users,
+  _group_by(_get('age')),
+  console.log);
+
+_go(users,
+  _group_by(function(user) {
+    return user.age - user.age % 10;
+  }),
+  console.log);
+
+
+_go(users,
+  _group_by(function(user) {
+    return user.name[0];
+  }),
+  console.log);
+
+_go(users,
+  _group_by(_pipe(_get('name'), _head)),
+  console.log);
+
+//   3. count_by, inc
+
+console.log(
+  _count_by(users, function(user) {
+    return user.age - user.age % 10;
+  })
+);
+
+_go(users,
+  _count_by(function(user) {
+    return user.name[0];
+  }),
+  console.log);
+
+console.log( _pairs(users[0]) );
+
+console.clear();
+
+var f1 = _pipe(
+  _count_by(function(user) { return user.age - user.age % 10; }),
+  _map((count, key) => `<li>${key}대는 ${count}명 입니다.</li>`),
+  list => '<ul>' + list.join('') + '</ul>',
+  document.write.bind(document));
+
+_go(users, _reject(user => user.age < 20), f1);
+_go(users, _filter(user => user.age < 20), f1);

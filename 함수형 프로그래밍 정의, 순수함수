@@ -1,0 +1,33 @@
+함수형 프로그래밍
+  - 성공적인 프로그래밍을 위해 부수 효과를 미워하고 조합성을 강조하는 프로그래밍 패러다임
+  ( 부수 효과를 미워한다 -> 순수 함수를 만든다, 조합성을 강조하다 -> 모듈화 수준을 높히다)
+  
+  - 순수함수 : 오류를 줄이고 안정성을 높힘
+  - 모듈화 수준이 높음 : 생산성 up
+  
+/* 순수 함수 */
+function add(a, b) {
+  return a + b;
+}
+
+var obj1 = { val: 10 };
+function add5(obj, b) {
+  return { val: obj.val + b }
+}     //obj의 값을 참조만 할 뿐 변경x
+
+/* 순수 함수가 아닌경우 */
+var c = 10;
+function add2(a, b) {
+  return a + b + c;
+}     // c값의 변화 가능성이 생김
+
+var c = 20;
+function add3(a, b) {
+  c = b;
+  return a + b;
+}     // b 값의 변화
+
+var obj1 = { val: 10 };
+function add4(obj, b) {
+  obj.val += b;
+}     // return값도 없고 들어온 값을 직접 변경

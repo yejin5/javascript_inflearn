@@ -28,7 +28,7 @@ var comments = [
   { id: 310, body: '댓글10', user_id: 105, post_id: 201 }
 ];
 
-// 1. 특정인의 posts의 모든 comments 거르기
+// 1. 특정인의 posts의 모든 comments 거르기 -> 모든 comment를 확인하며 
 
 function posts_by(attr) {
   return _.where(posts, attr);
@@ -59,7 +59,7 @@ var f2 = _.pipe(f1, comments_to_user_names, _.uniq);
 console.log(f2({ user_id: 101 }));
 
 
-// 3. 특정인의 posts에 comments를 단 친구들 카운트 정보
+// 3. 특정인의 posts에 comments를 단 친구들 카운트 정보 -> 2번에서 uniq대신 count로
 
 var f3 = _.pipe(f1, comments_to_user_names, _.count_by);
 

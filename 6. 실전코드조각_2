@@ -6,7 +6,7 @@ var products = [
     sizes: [ // <---- 장바구니에 담은 동일 상품의 사이즈 별 수량과 가격
       { name: "L", quantity: 4, price: 0 },
       { name: "XL", quantity: 2, price: 0 },
-      { name: "2XL", quantity: 3, price: 2000 }, // <-- 옵션의 추가 가격
+      { name: "2XL", quantity: 3, price: 2000 }, // <-- 옵션의 추가 가격(2000)
     ]
   },
   {
@@ -28,7 +28,7 @@ var products = [
   }
 ];
 
-//1. 모든 수량
+//1. 모든 수량 (reduce로 순회,,)
 var total_quantity = _.reduce(function(tq, product) {
   return _.reduce(product.sizes, function(tq, size) {
     return tq + size.quantity;
@@ -38,6 +38,8 @@ var total_quantity = _.reduce(function(tq, product) {
 _.go(products,
   total_quantity,
   console.log);
+  
+-> 조립하면서 만드는 것이 함수형 프로그래밍
 
 //2. 선택 된 총 수량
 
